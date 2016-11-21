@@ -8,6 +8,7 @@
 // @version     1.33.7
 // @grant       unsafeWindow
 // @grant       GM_xmlhttpRequest
+// @permissions http://ssh.locker.phinugamma.org/
 // ==/UserScript==
 
 /* XXX TODO
@@ -17,14 +18,12 @@
  and save the api for ourselves.
  (This is how ytcenter does it (y) */
 
-console.log("[Auto-download] Youtube Auto-dowloader loading");
+YOUTUBE_ARCHIVER_HOST = "locker.phinugamma.org"
 
 function sendPage(uri) {
-  uri = uri || unsafeWindow.document.location;
-
   GM_xmlhttpRequest({
     method: 'GET',
-    url: 'http://localhost:8080/dlvid?url=' + escape(uri)
+    url: '//' + YOUTUBE_ARCHIVER_HOST + '/dlvid?url=' + escape(uri)
   });
   
   // Old XHR code. Used to work... even though it shouldn't have
@@ -46,9 +45,23 @@ function getURLFromPlayer(player) {
   return currentVid;
 }
 
+
+// Entry point //
+console.log("[Auto-download] Youtube Auto-dowloader loading");
+
 if (window.top == window.self) {
-  console.log("[Auto-download] Sending Youtube page");
-  sendPage();
+  var currentPage = undefined
+
+  function checkNavigate() {
+    // Check every second for page change
+    if (unsafeWindow.document.location.toString() != currentPage) {
+      console.log("[Auto-download] Sending Youtube page");
+      currentPage = unsafeWindow.document.location.toString()
+      sendPage(currentPage);
+    }
+    setTimeout(checkNavigate, 2000)
+  }
+  checkNavigate()
 } else if (window.location.toString().search('/embed/') > 0) {
   var player;
   var currentVid;

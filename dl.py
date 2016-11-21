@@ -8,13 +8,11 @@ import os
 def dlvid():
   url = request.args.get('url')
   
-  #f = open(os.path.join(original_path, "log.txt"), "a")
-  f = open(os.path.join(original_path, "todo.txt"), "a")
+  f = open(os.path.join(original_path, "log.txt"), "a")
   
   try:
-    #ydl.download([url])
-    #f.write("Downloaded " + url + '\n')
-	f.write("pls download this -> " + url + '\n')
+    ydl.download([url])
+    f.write("Downloaded " + url + '\n')
   except Exception as e:
     f.write("FAILED " + url + ' . because' + e + '\n')
 
@@ -23,7 +21,7 @@ def dlvid():
   return ""
 
 if __name__ == "__main__":
-  ydl_opts = { 'continuedl': True, 'format': 'bestvideo[ext=mp4]+bestaudio', 'noplaylist': True }
+  ydl_opts = { 'continuedl': True, 'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]', 'noplaylist': True }
   ydl = YoutubeDL(ydl_opts)
   ydl.add_default_info_extractors()
 
