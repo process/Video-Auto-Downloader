@@ -15,6 +15,10 @@ TMP_PATH = "/mnt/Data/Public/Videos/Other/Youtubes/downloader/temp"
 def dlvid():
   url = request.args.get('url')
 
+  if 'results' in url and 'search_query' in url:
+    # This is a search page
+    return ""
+
   f = open(os.path.join(original_path, "log.txt"), "a")
 
   try:
