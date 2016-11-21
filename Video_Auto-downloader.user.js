@@ -2,8 +2,7 @@
 // @name        Video Auto-downloader
 // @namespace   png-vid-archive
 // @description Downloads every viewed online video
-// @include     http*://*youtube.com/watch?v=*
-// @include     http*://*youtube.com/embed/*
+// @include     http*://*youtube.com/*
 // @include     http*://vimeo.com/*
 // @version     1.33.7
 // ==/UserScript==
