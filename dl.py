@@ -1,23 +1,43 @@
+import os
+import tempfile
+import shutil
+
 from youtube_dl import YoutubeDL
 from flask import Flask, request
+from qtfaststart import processor, exceptions
+
 app = Flask(__name__)
 
-import os
-	
-@app.route("/dlvid")
+VID_PATH = "/mnt/Data/Public/Videos/Other/Youtubes/vids/"
+TMP_PATH = "/mnt/Data/Public/Videos/Other/Youtubes/downloader/temp"
+
+@app.route("/dlvid", methods=["GET"])
 def dlvid():
   url = request.args.get('url')
-  
+
   f = open(os.path.join(original_path, "log.txt"), "a")
-  
+
   try:
+    info_dict = ydl.extract_info(url, download=False)
+    filename = ydl.prepare_filename(info_dict)
+    if os.path.isfile(filename):
+       print "File already downloaded"
+       return ""
     ydl.download([url])
+    tmp, outfile = tempfile.mkstemp(dir=TMP_PATH)
+    os.close(tmp)
+    try:
+      processor.process(VID_PATH + filename, outfile)
+      shutil.move(outfile, VID_PATH + filename)
+    except exceptions.FastStartException:
+      # stupid library throws exception if file is already setup properly
+      print "Ignoring moov failure for already setup file"
     f.write("Downloaded " + url + '\n')
   except Exception as e:
-    f.write("FAILED " + url + ' . because' + e + '\n')
+    f.write("FAILED " + url + ' . because ' + e.message + '\n')
 
   f.close()
-  
+
   return ""
 
 if __name__ == "__main__":
@@ -26,5 +46,5 @@ if __name__ == "__main__":
   ydl.add_default_info_extractors()
 
   original_path = os.getcwd()
-  os.chdir("Z:/Videos/Other/Youtubes/vids")
-  app.run(port=8080)
+  os.chdir(VID_PATH)
+  app.run(host="0.0.0.0", port=8080, threaded=True)
