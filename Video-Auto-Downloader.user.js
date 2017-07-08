@@ -4,7 +4,8 @@
 // @description Downloads every viewed online video
 // @include     http*://*youtube.com/*
 // @include     http*://vimeo.com/*
-// @version     1.33.7
+// @grant       none
+// @version     1.33.7.2
 // ==/UserScript==
 
 function inject(func) {
@@ -38,11 +39,15 @@ function YoutubeAutoDownloader() {
       currentUrl = locationStr;
       sendPage(currentUrl);
     }
-    setTimeout(checkPageNavigate, 2000)
+    setTimeout(checkPageNavigate, 2000);
+  }
+  
+  function getEmbeddedPlayer() {
+    return document.getElementById("player").childNodes[0];
   }
 
   function checkEmbedReadiness() {
-    if (window.yt) {
+    if (window.yt && getEmbeddedPlayer()) {
       console.log("[Auto-download] Setting up embedded handler")
       setupEmbeddedEventHandler();
     } else {
@@ -59,7 +64,7 @@ function YoutubeAutoDownloader() {
 
   function setupEmbeddedEventHandler() {
     // Hook into embedded player event
-    player = window.yt.player.getPlayerByElement("player");
+    var player = getEmbeddedPlayer();
     player.addEventListener('onStateChange', function(state) {
       if (state == 1) { // Playing
         var playingVid = getURLFromPlayer(player);
