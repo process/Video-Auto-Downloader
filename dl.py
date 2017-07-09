@@ -1,6 +1,7 @@
 import os
 import tempfile
 import shutil
+from threading import Thread
 
 from youtube_dl import YoutubeDL
 from flask import Flask, request
@@ -11,16 +12,8 @@ app = Flask(__name__)
 VID_PATH = "/mnt/Data/Public/Videos/Other/Youtubes/vids/"
 TMP_PATH = "/mnt/Data/Public/Videos/Other/Youtubes/downloader/temp"
 
-@app.route("/dlvid", methods=["GET"])
-def dlvid():
-  url = request.args.get('url')
-
-  if 'results' in url and 'search_query' in url:
-    # This is a search page
-    return ""
-
+def download(url):
   f = open(os.path.join(original_path, "log.txt"), "a")
-
   try:
     info_dict = ydl.extract_info(url, download=False)
     filename = ydl.prepare_filename(info_dict)
@@ -39,9 +32,15 @@ def dlvid():
     f.write("Downloaded " + url + '\n')
   except Exception as e:
     f.write("FAILED " + url + ' . because ' + e.message + '\n')
-
   f.close()
 
+@app.route("/dlvid", methods=["GET"])
+def dlvid():
+  url = request.args.get('url')
+  if 'results' in url and 'search_query' in url:
+    # This is a search page
+    return ""
+  Thread(target=download, args=(url,)).start()
   return ""
 
 if __name__ == "__main__":
