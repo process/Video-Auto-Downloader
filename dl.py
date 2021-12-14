@@ -4,7 +4,7 @@ import shutil
 import traceback
 from threading import Thread
 
-from youtube_dl import YoutubeDL
+from yt_dlp import YoutubeDL
 from flask import Flask, request
 from qtfaststart import processor, exceptions
 
@@ -73,7 +73,7 @@ def dlvid():
 
 def init():
   global ydl, log_file
-  ydl_opts = { 'continuedl': True, 'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]', 'noplaylist': True}
+  ydl_opts = { 'continuedl': True, 'outtmpl': {'default': '%(title)s-%(id)s.%(ext)s'}, 'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]', 'noplaylist': True}
   ydl = YoutubeDL(ydl_opts)
   ydl.add_default_info_extractors()
 
